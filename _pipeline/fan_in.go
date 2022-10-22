@@ -21,7 +21,7 @@ func sq(in <-chan int) <-chan int {
 
 	go func() {
 		for v := range in {
-			c <- v
+			c <- v * v
 		}
 		close(c)
 	}()
