@@ -30,24 +30,18 @@ func main() {
 	ctx, cancel = context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	// A *DB is a pool of connections. Call Conn to reserve a connection for
-	// exclusive use.
-	conn, err := db.Conn(ctx)
+	tx, err := db.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer conn.Close() // Return the connection to the pool.
 
-	id := 2
-	result, err := conn.ExecContext(ctx, "update people set active=false where id=$1", id)
-	if err != nil {
-		log.Fatal(err)
+	id := 5
+	_, execErr := tx.Exec("update people set active=true where id=$1;", id)
+	if execErr != nil {
+		_ = tx.Rollback()
+		log.Fatal(execErr)
 	}
-	rows, err := result.RowsAffected()
-	if err != nil {
+	if err := tx.Commit(); err != nil {
 		log.Fatal(err)
-	}
-	if rows != 1 {
-		log.Fatalf("expected single row affected, got %d rows affected", rows)
 	}
 }
