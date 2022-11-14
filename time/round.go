@@ -23,6 +23,6 @@ func main() {
 	}
 
 	for _, r := range round {
-		fmt.Printf("d.Round(%6s) = %s\n", r, d.Round(r).String())
+		fmt.Printf("d.Round(%6s) = %s\n", r, d.Round(r).String()pa)
 	}
 }
